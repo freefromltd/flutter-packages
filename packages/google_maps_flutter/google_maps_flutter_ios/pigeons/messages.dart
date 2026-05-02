@@ -464,6 +464,7 @@ class PlatformMapConfiguration {
     required this.myLocationEnabled,
     required this.myLocationButtonEnabled,
     required this.padding,
+    required this.lockCameraOnPaddingChange,
     required this.indoorViewEnabled,
     required this.trafficEnabled,
     required this.buildingsEnabled,
@@ -484,6 +485,7 @@ class PlatformMapConfiguration {
   final bool? myLocationEnabled;
   final bool? myLocationButtonEnabled;
   final PlatformEdgeInsets? padding;
+  final bool? lockCameraOnPaddingChange;
   final bool? indoorViewEnabled;
   final bool? trafficEnabled;
   final bool? buildingsEnabled;

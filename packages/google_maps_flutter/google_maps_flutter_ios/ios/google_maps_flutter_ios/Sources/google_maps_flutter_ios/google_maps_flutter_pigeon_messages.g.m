@@ -2251,6 +2251,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
                      myLocationEnabled:(nullable NSNumber *)myLocationEnabled
                myLocationButtonEnabled:(nullable NSNumber *)myLocationButtonEnabled
                                padding:(nullable FGMPlatformEdgeInsets *)padding
+             lockCameraOnPaddingChange:(nullable NSNumber *)lockCameraOnPaddingChange
                      indoorViewEnabled:(nullable NSNumber *)indoorViewEnabled
                         trafficEnabled:(nullable NSNumber *)trafficEnabled
                       buildingsEnabled:(nullable NSNumber *)buildingsEnabled
@@ -2270,6 +2271,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
   pigeonResult.myLocationEnabled = myLocationEnabled;
   pigeonResult.myLocationButtonEnabled = myLocationButtonEnabled;
   pigeonResult.padding = padding;
+  pigeonResult.lockCameraOnPaddingChange = lockCameraOnPaddingChange;
   pigeonResult.indoorViewEnabled = indoorViewEnabled;
   pigeonResult.trafficEnabled = trafficEnabled;
   pigeonResult.buildingsEnabled = buildingsEnabled;
@@ -2292,13 +2294,14 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
   pigeonResult.myLocationEnabled = GetNullableObjectAtIndex(list, 9);
   pigeonResult.myLocationButtonEnabled = GetNullableObjectAtIndex(list, 10);
   pigeonResult.padding = GetNullableObjectAtIndex(list, 11);
-  pigeonResult.indoorViewEnabled = GetNullableObjectAtIndex(list, 12);
-  pigeonResult.trafficEnabled = GetNullableObjectAtIndex(list, 13);
-  pigeonResult.buildingsEnabled = GetNullableObjectAtIndex(list, 14);
-  FGMPlatformMarkerTypeBox *boxedFGMPlatformMarkerType = GetNullableObjectAtIndex(list, 15);
+  pigeonResult.lockCameraOnPaddingChange = GetNullableObjectAtIndex(list, 12);
+  pigeonResult.indoorViewEnabled = GetNullableObjectAtIndex(list, 13);
+  pigeonResult.trafficEnabled = GetNullableObjectAtIndex(list, 14);
+  pigeonResult.buildingsEnabled = GetNullableObjectAtIndex(list, 15);
+  FGMPlatformMarkerTypeBox *boxedFGMPlatformMarkerType = GetNullableObjectAtIndex(list, 16);
   pigeonResult.markerType = boxedFGMPlatformMarkerType.value;
-  pigeonResult.mapId = GetNullableObjectAtIndex(list, 16);
-  pigeonResult.style = GetNullableObjectAtIndex(list, 17);
+  pigeonResult.mapId = GetNullableObjectAtIndex(list, 17);
+  pigeonResult.style = GetNullableObjectAtIndex(list, 18);
   return pigeonResult;
 }
 + (nullable FGMPlatformMapConfiguration *)nullableFromList:(NSArray<id> *)list {
@@ -2318,6 +2321,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
     self.myLocationEnabled ?: [NSNull null],
     self.myLocationButtonEnabled ?: [NSNull null],
     self.padding ?: [NSNull null],
+    self.lockCameraOnPaddingChange ?: [NSNull null],
     self.indoorViewEnabled ?: [NSNull null],
     self.trafficEnabled ?: [NSNull null],
     self.buildingsEnabled ?: [NSNull null],

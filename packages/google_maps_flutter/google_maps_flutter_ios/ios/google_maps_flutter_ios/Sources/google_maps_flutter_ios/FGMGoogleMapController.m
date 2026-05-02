@@ -249,6 +249,7 @@
 @property(nonatomic, strong) FGMMapsCallbackApi *dartCallbackHandler;
 @property(nonatomic, strong) FGMDefaultMapEventHandler *mapEventHandler;
 @property(nonatomic, assign) BOOL trackCameraPosition;
+@property(nonatomic, assign) BOOL lockCameraOnPaddingChange;
 @property(nonatomic, strong) FGMClusterManagersController *clusterManagersController;
 @property(nonatomic, strong) FGMMarkersController *markersController;
 @property(nonatomic, strong) FGMPolygonsController *polygonsController;
@@ -447,7 +448,16 @@
 }
 
 - (void)setPaddingTop:(float)top left:(float)left bottom:(float)bottom right:(float)right {
-  self.mapView.padding = UIEdgeInsetsMake(top, left, bottom, right);
+  if (self.lockCameraOnPaddingChange) {
+    UIEdgeInsets oldPadding = self.mapView.padding;
+    UIEdgeInsets newPadding = UIEdgeInsetsMake(top, left, bottom, right);
+    CGFloat deltaX = ((newPadding.left - newPadding.right) - (oldPadding.left - oldPadding.right)) / 2.0;
+    CGFloat deltaY = ((newPadding.top - newPadding.bottom) - (oldPadding.top - oldPadding.bottom)) / 2.0;
+    self.mapView.padding = newPadding;
+    [self.mapView moveCamera:[GMSCameraUpdate scrollByX:deltaX Y:deltaY]];
+  } else {
+    self.mapView.padding = UIEdgeInsetsMake(top, left, bottom, right);
+  }
 }
 
 - (void)setRotateGesturesEnabled:(BOOL)enabled {
@@ -603,6 +613,10 @@
   FGMPlatformEdgeInsets *padding = config.padding;
   if (padding) {
     [self setPaddingTop:padding.top left:padding.left bottom:padding.bottom right:padding.right];
+  }
+  NSNumber *lockCameraOnPaddingChange = config.lockCameraOnPaddingChange;
+  if (lockCameraOnPaddingChange != nil) {
+    self.lockCameraOnPaddingChange = lockCameraOnPaddingChange.boolValue;
   }
 
   NSNumber *rotateGesturesEnabled = config.rotateGesturesEnabled;
