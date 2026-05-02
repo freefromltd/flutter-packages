@@ -1635,6 +1635,7 @@ class PlatformMapConfiguration {
     this.myLocationEnabled,
     this.myLocationButtonEnabled,
     this.padding,
+    this.lockCameraOnPaddingChange,
     this.indoorViewEnabled,
     this.trafficEnabled,
     this.buildingsEnabled,
@@ -1667,6 +1668,8 @@ class PlatformMapConfiguration {
 
   PlatformEdgeInsets? padding;
 
+  bool? lockCameraOnPaddingChange;
+
   bool? indoorViewEnabled;
 
   bool? trafficEnabled;
@@ -1693,6 +1696,7 @@ class PlatformMapConfiguration {
       myLocationEnabled,
       myLocationButtonEnabled,
       padding,
+      lockCameraOnPaddingChange,
       indoorViewEnabled,
       trafficEnabled,
       buildingsEnabled,
@@ -1721,12 +1725,13 @@ class PlatformMapConfiguration {
       myLocationEnabled: result[9] as bool?,
       myLocationButtonEnabled: result[10] as bool?,
       padding: result[11] as PlatformEdgeInsets?,
-      indoorViewEnabled: result[12] as bool?,
-      trafficEnabled: result[13] as bool?,
-      buildingsEnabled: result[14] as bool?,
-      markerType: result[15]! as PlatformMarkerType,
-      mapId: result[16] as String?,
-      style: result[17] as String?,
+      lockCameraOnPaddingChange: result[12] as bool?,
+      indoorViewEnabled: result[13] as bool?,
+      trafficEnabled: result[14] as bool?,
+      buildingsEnabled: result[15] as bool?,
+      markerType: result[16]! as PlatformMarkerType,
+      mapId: result[17] as String?,
+      style: result[18] as String?,
     );
   }
 

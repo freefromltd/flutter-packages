@@ -117,6 +117,7 @@ class GoogleMap extends StatefulWidget {
     this.myLocationButtonEnabled = true,
     this.layoutDirection,
     this.padding = EdgeInsets.zero,
+    this.lockCameraOnPaddingChange = false,
     this.indoorViewEnabled = false,
     this.trafficEnabled = false,
     this.buildingsEnabled = true,
@@ -217,6 +218,8 @@ class GoogleMap extends StatefulWidget {
   ///
   /// If no padding is specified, the default padding is 0.
   final EdgeInsets padding;
+
+  final bool lockCameraOnPaddingChange;
 
   /// Markers to be placed on the map.
   final Set<Marker> markers;
@@ -738,6 +741,7 @@ MapConfiguration _configurationFromMapWidget(GoogleMap map) {
     myLocationEnabled: map.myLocationEnabled,
     myLocationButtonEnabled: map.myLocationButtonEnabled,
     padding: map.padding,
+    lockCameraOnPaddingChange: map.lockCameraOnPaddingChange,
     indoorViewEnabled: map.indoorViewEnabled,
     trafficEnabled: map.trafficEnabled,
     buildingsEnabled: map.buildingsEnabled,
