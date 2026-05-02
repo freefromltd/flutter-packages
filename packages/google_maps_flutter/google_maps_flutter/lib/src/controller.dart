@@ -124,7 +124,7 @@ class GoogleMapController {
   /// platform side.
   ///
   /// The returned [Future] completes after listeners have been notified.
-  Future<void> _updateMapConfiguration(MapConfiguration update) {
+  Future<void> updateMapConfiguration(MapConfiguration update) {
     return GoogleMapsFlutterPlatform.instance.updateMapConfiguration(update, mapId: mapId);
   }
 

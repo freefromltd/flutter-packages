@@ -510,7 +510,7 @@ class _GoogleMapState extends State<GoogleMap> {
     if (updates.isEmpty) {
       return;
     }
-    unawaited(controller._updateMapConfiguration(updates));
+    unawaited(controller.updateMapConfiguration(updates));
     _mapConfiguration = newConfig;
   }
 
