@@ -861,12 +861,52 @@ class PlatformWeightedLatLng {
 
 /// Pigeon equivalent of the ClusterManager class.
 class PlatformClusterManager {
-  PlatformClusterManager({required this.identifier});
+  PlatformClusterManager({
+    required this.identifier,
+    this.maxDistance,
+    this.minClusterSize,
+    this.coreColor,
+    this.strokeColor,
+    this.outerRingColor,
+    this.textColor,
+    this.fontFamily,
+    this.fontSize,
+    this.circleSize,
+  });
 
   String identifier;
 
+  double? maxDistance;
+
+  int? minClusterSize;
+
+  int? coreColor;
+
+  int? strokeColor;
+
+  int? outerRingColor;
+
+  int? textColor;
+
+  String? fontFamily;
+
+  double? fontSize;
+
+  double? circleSize;
+
   List<Object?> _toList() {
-    return <Object?>[identifier];
+    return <Object?>[
+      identifier,
+      maxDistance,
+      minClusterSize,
+      coreColor,
+      strokeColor,
+      outerRingColor,
+      textColor,
+      fontFamily,
+      fontSize,
+      circleSize,
+    ];
   }
 
   Object encode() {
@@ -875,7 +915,18 @@ class PlatformClusterManager {
 
   static PlatformClusterManager decode(Object result) {
     result as List<Object?>;
-    return PlatformClusterManager(identifier: result[0]! as String);
+    return PlatformClusterManager(
+      identifier: result[0]! as String,
+      maxDistance: result[1] as double?,
+      minClusterSize: result[2] as int?,
+      coreColor: result[3] as int?,
+      strokeColor: result[4] as int?,
+      outerRingColor: result[5] as int?,
+      textColor: result[6] as int?,
+      fontFamily: result[7] as String?,
+      fontSize: result[8] as double?,
+      circleSize: result[9] as double?,
+    );
   }
 
   @override
@@ -887,7 +938,16 @@ class PlatformClusterManager {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(identifier, other.identifier);
+    return _deepEquals(identifier, other.identifier) &&
+        _deepEquals(maxDistance, other.maxDistance) &&
+        _deepEquals(minClusterSize, other.minClusterSize) &&
+        _deepEquals(coreColor, other.coreColor) &&
+        _deepEquals(strokeColor, other.strokeColor) &&
+        _deepEquals(outerRingColor, other.outerRingColor) &&
+        _deepEquals(textColor, other.textColor) &&
+        _deepEquals(fontFamily, other.fontFamily) &&
+        _deepEquals(fontSize, other.fontSize) &&
+        _deepEquals(circleSize, other.circleSize);
   }
 
   @override
@@ -1054,6 +1114,7 @@ class PlatformMarker {
     required this.markerId,
     this.clusterManagerId,
     this.collisionBehavior = PlatformMarkerCollisionBehavior.requiredDisplay,
+    this.itemCount,
   });
 
   double alpha;
@@ -1084,6 +1145,8 @@ class PlatformMarker {
 
   PlatformMarkerCollisionBehavior collisionBehavior;
 
+  int? itemCount;
+
   List<Object?> _toList() {
     return <Object?>[
       alpha,
@@ -1100,6 +1163,7 @@ class PlatformMarker {
       markerId,
       clusterManagerId,
       collisionBehavior,
+      itemCount,
     ];
   }
 
@@ -1124,6 +1188,7 @@ class PlatformMarker {
       markerId: result[11]! as String,
       clusterManagerId: result[12] as String?,
       collisionBehavior: result[13]! as PlatformMarkerCollisionBehavior,
+      itemCount: result[14] as int?,
     );
   }
 
@@ -1149,7 +1214,8 @@ class PlatformMarker {
         _deepEquals(zIndex, other.zIndex) &&
         _deepEquals(markerId, other.markerId) &&
         _deepEquals(clusterManagerId, other.clusterManagerId) &&
-        _deepEquals(collisionBehavior, other.collisionBehavior);
+        _deepEquals(collisionBehavior, other.collisionBehavior) &&
+        _deepEquals(itemCount, other.itemCount);
   }
 
   @override

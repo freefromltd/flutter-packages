@@ -1299,14 +1299,41 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
 @end
 
 @implementation FGMPlatformClusterManager
-+ (instancetype)makeWithIdentifier:(NSString *)identifier {
++ (instancetype)makeWithIdentifier:(NSString *)identifier
+                       maxDistance:(nullable NSNumber *)maxDistance
+                    minClusterSize:(nullable NSNumber *)minClusterSize
+                         coreColor:(nullable NSNumber *)coreColor
+                       strokeColor:(nullable NSNumber *)strokeColor
+                    outerRingColor:(nullable NSNumber *)outerRingColor
+                         textColor:(nullable NSNumber *)textColor
+                        fontFamily:(nullable NSString *)fontFamily
+                          fontSize:(nullable NSNumber *)fontSize
+                        circleSize:(nullable NSNumber *)circleSize {
   FGMPlatformClusterManager *pigeonResult = [[FGMPlatformClusterManager alloc] init];
   pigeonResult.identifier = identifier;
+  pigeonResult.maxDistance = maxDistance;
+  pigeonResult.minClusterSize = minClusterSize;
+  pigeonResult.coreColor = coreColor;
+  pigeonResult.strokeColor = strokeColor;
+  pigeonResult.outerRingColor = outerRingColor;
+  pigeonResult.textColor = textColor;
+  pigeonResult.fontFamily = fontFamily;
+  pigeonResult.fontSize = fontSize;
+  pigeonResult.circleSize = circleSize;
   return pigeonResult;
 }
 + (FGMPlatformClusterManager *)fromList:(NSArray<id> *)list {
   FGMPlatformClusterManager *pigeonResult = [[FGMPlatformClusterManager alloc] init];
   pigeonResult.identifier = GetNullableObjectAtIndex(list, 0);
+  pigeonResult.maxDistance = GetNullableObjectAtIndex(list, 1);
+  pigeonResult.minClusterSize = GetNullableObjectAtIndex(list, 2);
+  pigeonResult.coreColor = GetNullableObjectAtIndex(list, 3);
+  pigeonResult.strokeColor = GetNullableObjectAtIndex(list, 4);
+  pigeonResult.outerRingColor = GetNullableObjectAtIndex(list, 5);
+  pigeonResult.textColor = GetNullableObjectAtIndex(list, 6);
+  pigeonResult.fontFamily = GetNullableObjectAtIndex(list, 7);
+  pigeonResult.fontSize = GetNullableObjectAtIndex(list, 8);
+  pigeonResult.circleSize = GetNullableObjectAtIndex(list, 9);
   return pigeonResult;
 }
 + (nullable FGMPlatformClusterManager *)nullableFromList:(NSArray<id> *)list {
@@ -1315,6 +1342,15 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
 - (NSArray<id> *)toList {
   return @[
     self.identifier ?: [NSNull null],
+    self.maxDistance ?: [NSNull null],
+    self.minClusterSize ?: [NSNull null],
+    self.coreColor ?: [NSNull null],
+    self.strokeColor ?: [NSNull null],
+    self.outerRingColor ?: [NSNull null],
+    self.textColor ?: [NSNull null],
+    self.fontFamily ?: [NSNull null],
+    self.fontSize ?: [NSNull null],
+    self.circleSize ?: [NSNull null],
   ];
 }
 - (BOOL)isEqual:(id)object {
@@ -1352,7 +1388,8 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
                        zIndex:(NSInteger)zIndex
                      markerId:(NSString *)markerId
              clusterManagerId:(nullable NSString *)clusterManagerId
-            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior {
+            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior
+                    itemCount:(nullable NSNumber *)itemCount {
   FGMPlatformMarker *pigeonResult = [[FGMPlatformMarker alloc] init];
   pigeonResult.alpha = alpha;
   pigeonResult.anchor = anchor;
@@ -1368,6 +1405,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
   pigeonResult.markerId = markerId;
   pigeonResult.clusterManagerId = clusterManagerId;
   pigeonResult.collisionBehavior = collisionBehavior;
+  pigeonResult.itemCount = itemCount;
   return pigeonResult;
 }
 + (FGMPlatformMarker *)fromList:(NSArray<id> *)list {
@@ -1386,6 +1424,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
   pigeonResult.markerId = GetNullableObjectAtIndex(list, 11);
   pigeonResult.clusterManagerId = GetNullableObjectAtIndex(list, 12);
   pigeonResult.collisionBehavior = GetNullableObjectAtIndex(list, 13);
+  pigeonResult.itemCount = GetNullableObjectAtIndex(list, 14);
   return pigeonResult;
 }
 + (nullable FGMPlatformMarker *)nullableFromList:(NSArray<id> *)list {
@@ -1407,6 +1446,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
     self.markerId ?: [NSNull null],
     self.clusterManagerId ?: [NSNull null],
     self.collisionBehavior ?: [NSNull null],
+    self.itemCount ?: [NSNull null],
   ];
 }
 - (BOOL)isEqual:(id)object {

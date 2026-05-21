@@ -282,9 +282,10 @@ class GoogleMapsFlutterIOS extends GoogleMapsFlutterPlatform {
     required int mapId,
   }) {
     return _hostApi(mapId).updateClusterManagers(
-      clusterManagerUpdates.clusterManagersToAdd
-          .map(_platformClusterManagerFromClusterManager)
-          .toList(),
+      <ClusterManager>{
+        ...clusterManagerUpdates.clusterManagersToAdd,
+        ...clusterManagerUpdates.clusterManagersToChange,
+      }.map(_platformClusterManagerFromClusterManager).toList(),
       clusterManagerUpdates.clusterManagerIdsToRemove
           .map((ClusterManagerId id) => id.value)
           .toList(),

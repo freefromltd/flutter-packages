@@ -1021,17 +1021,56 @@ data class PlatformWeightedLatLng(val point: PlatformLatLng, val weight: Double)
  *
  * Generated class from Pigeon that represents data sent in messages.
  */
-data class PlatformClusterManager(val identifier: String) {
+data class PlatformClusterManager(
+    val identifier: String,
+    val maxDistance: Double? = null,
+    val minClusterSize: Long? = null,
+    val coreColor: Long? = null,
+    val strokeColor: Long? = null,
+    val outerRingColor: Long? = null,
+    val textColor: Long? = null,
+    val fontFamily: String? = null,
+    val fontSize: Double? = null,
+    val circleSize: Double? = null
+) {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): PlatformClusterManager {
       val identifier = pigeonVar_list[0] as String
-      return PlatformClusterManager(identifier)
+      val maxDistance = pigeonVar_list[1] as Double?
+      val minClusterSize = pigeonVar_list[2] as Long?
+      val coreColor = pigeonVar_list[3] as Long?
+      val strokeColor = pigeonVar_list[4] as Long?
+      val outerRingColor = pigeonVar_list[5] as Long?
+      val textColor = pigeonVar_list[6] as Long?
+      val fontFamily = pigeonVar_list[7] as String?
+      val fontSize = pigeonVar_list[8] as Double?
+      val circleSize = pigeonVar_list[9] as Double?
+      return PlatformClusterManager(
+          identifier,
+          maxDistance,
+          minClusterSize,
+          coreColor,
+          strokeColor,
+          outerRingColor,
+          textColor,
+          fontFamily,
+          fontSize,
+          circleSize)
     }
   }
 
   fun toList(): List<Any?> {
     return listOf(
         identifier,
+        maxDistance,
+        minClusterSize,
+        coreColor,
+        strokeColor,
+        outerRingColor,
+        textColor,
+        fontFamily,
+        fontSize,
+        circleSize,
     )
   }
 
@@ -1043,12 +1082,30 @@ data class PlatformClusterManager(val identifier: String) {
       return true
     }
     val other = other as PlatformClusterManager
-    return MessagesPigeonUtils.deepEquals(this.identifier, other.identifier)
+    return MessagesPigeonUtils.deepEquals(this.identifier, other.identifier) &&
+        MessagesPigeonUtils.deepEquals(this.maxDistance, other.maxDistance) &&
+        MessagesPigeonUtils.deepEquals(this.minClusterSize, other.minClusterSize) &&
+        MessagesPigeonUtils.deepEquals(this.coreColor, other.coreColor) &&
+        MessagesPigeonUtils.deepEquals(this.strokeColor, other.strokeColor) &&
+        MessagesPigeonUtils.deepEquals(this.outerRingColor, other.outerRingColor) &&
+        MessagesPigeonUtils.deepEquals(this.textColor, other.textColor) &&
+        MessagesPigeonUtils.deepEquals(this.fontFamily, other.fontFamily) &&
+        MessagesPigeonUtils.deepEquals(this.fontSize, other.fontSize) &&
+        MessagesPigeonUtils.deepEquals(this.circleSize, other.circleSize)
   }
 
   override fun hashCode(): Int {
     var result = javaClass.hashCode()
     result = 31 * result + MessagesPigeonUtils.deepHash(this.identifier)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.maxDistance)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.minClusterSize)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.coreColor)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.strokeColor)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.outerRingColor)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.textColor)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.fontFamily)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.fontSize)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.circleSize)
     return result
   }
 
@@ -1217,7 +1274,8 @@ data class PlatformMarker(
     val zIndex: Double,
     val markerId: String,
     val clusterManagerId: String? = null,
-    val collisionBehavior: PlatformMarkerCollisionBehavior
+    val collisionBehavior: PlatformMarkerCollisionBehavior,
+    val itemCount: Long? = null
 ) {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): PlatformMarker {
@@ -1235,6 +1293,7 @@ data class PlatformMarker(
       val markerId = pigeonVar_list[11] as String
       val clusterManagerId = pigeonVar_list[12] as String?
       val collisionBehavior = pigeonVar_list[13] as PlatformMarkerCollisionBehavior
+      val itemCount = pigeonVar_list[14] as Long?
       return PlatformMarker(
           alpha,
           anchor,
@@ -1249,7 +1308,8 @@ data class PlatformMarker(
           zIndex,
           markerId,
           clusterManagerId,
-          collisionBehavior)
+          collisionBehavior,
+          itemCount)
     }
   }
 
@@ -1269,6 +1329,7 @@ data class PlatformMarker(
         markerId,
         clusterManagerId,
         collisionBehavior,
+        itemCount,
     )
   }
 
@@ -1293,7 +1354,8 @@ data class PlatformMarker(
         MessagesPigeonUtils.deepEquals(this.zIndex, other.zIndex) &&
         MessagesPigeonUtils.deepEquals(this.markerId, other.markerId) &&
         MessagesPigeonUtils.deepEquals(this.clusterManagerId, other.clusterManagerId) &&
-        MessagesPigeonUtils.deepEquals(this.collisionBehavior, other.collisionBehavior)
+        MessagesPigeonUtils.deepEquals(this.collisionBehavior, other.collisionBehavior) &&
+        MessagesPigeonUtils.deepEquals(this.itemCount, other.itemCount)
   }
 
   override fun hashCode(): Int {
@@ -1312,6 +1374,7 @@ data class PlatformMarker(
     result = 31 * result + MessagesPigeonUtils.deepHash(this.markerId)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.clusterManagerId)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.collisionBehavior)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.itemCount)
     return result
   }
 

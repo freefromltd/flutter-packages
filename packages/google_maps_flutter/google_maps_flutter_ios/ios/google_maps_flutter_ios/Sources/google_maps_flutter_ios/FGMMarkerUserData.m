@@ -14,6 +14,7 @@ void FGMSetIdentifiersToMarkerUserData(NSString *markerIdentifier,
   FGMMarkerUserData *userData = [[FGMMarkerUserData alloc] init];
   userData.markerIdentifier = markerIdentifier;
   userData.clusterManagerIdentifier = clusterManagerIdentifier;
+  userData.itemCount = 1;
   marker.userData = userData;
 };
 

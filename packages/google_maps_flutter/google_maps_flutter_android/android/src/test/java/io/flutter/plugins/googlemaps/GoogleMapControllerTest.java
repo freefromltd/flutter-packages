@@ -220,7 +220,7 @@ public class GoogleMapControllerTest {
   @Test
   public void SetInitialClusterManagers() {
     GoogleMapController googleMapController = getGoogleMapControllerWithMockedDependencies();
-    PlatformClusterManager initialClusterManager = new PlatformClusterManager("cm_1");
+    PlatformClusterManager initialClusterManager = new PlatformClusterManager("cm_1", null, null);
     List<PlatformClusterManager> initialClusterManagers = new ArrayList<>();
     initialClusterManagers.add(initialClusterManager);
     googleMapController.setInitialClusterManagers(initialClusterManagers);

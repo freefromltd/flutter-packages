@@ -201,9 +201,29 @@ class PlatformCluster {
 
 /// Pigeon equivalent of the ClusterManager class.
 class PlatformClusterManager {
-  PlatformClusterManager({required this.identifier});
+  PlatformClusterManager({
+    required this.identifier,
+    this.maxDistance,
+    this.minClusterSize,
+    this.coreColor,
+    this.strokeColor,
+    this.outerRingColor,
+    this.textColor,
+    this.fontFamily,
+    this.fontSize,
+    this.circleSize,
+  });
 
   final String identifier;
+  final double? maxDistance;
+  final int? minClusterSize;
+  final int? coreColor;
+  final int? strokeColor;
+  final int? outerRingColor;
+  final int? textColor;
+  final String? fontFamily;
+  final double? fontSize;
+  final double? circleSize;
 }
 
 /// Pigeon equivalent of the Marker class.
@@ -223,6 +243,7 @@ class PlatformMarker {
     this.zIndex = 0,
     this.clusterManagerId,
     this.collisionBehavior,
+    this.itemCount,
   });
 
   final double alpha;
@@ -240,6 +261,7 @@ class PlatformMarker {
   final String markerId;
   final String? clusterManagerId;
   final PlatformMarkerCollisionBehavior? collisionBehavior;
+  final int? itemCount;
 }
 
 /// Pigeon equivalent of the MarkerCollisionBehavior enum.

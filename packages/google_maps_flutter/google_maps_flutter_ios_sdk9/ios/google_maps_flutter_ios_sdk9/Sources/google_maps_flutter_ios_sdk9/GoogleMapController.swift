@@ -529,11 +529,14 @@ class MapCallHandler: MapsApi {
     changing toChange: [PlatformMarker],
     removing idsToRemove: [String]
   ) {
-    controller?.markersController.add(toAdd)
-    controller?.markersController.change(toChange)
-    controller?.markersController.removeMarkers(withIdentifiers: idsToRemove)
-    // Invoke clustering after markers are added.
-    controller?.clusterManagersController.invokeClusteringForEachClusterManager()
+    var clusterChanged = false
+    clusterChanged = (controller?.markersController.add(toAdd) ?? false) || clusterChanged
+    clusterChanged = (controller?.markersController.change(toChange) ?? false) || clusterChanged
+    clusterChanged = (controller?.markersController.removeMarkers(withIdentifiers: idsToRemove) ?? false) || clusterChanged
+
+    if clusterChanged {
+      controller?.clusterManagersController.invokeClusteringForEachClusterManager()
+    }
   }
 
   func updateClusterManagers(

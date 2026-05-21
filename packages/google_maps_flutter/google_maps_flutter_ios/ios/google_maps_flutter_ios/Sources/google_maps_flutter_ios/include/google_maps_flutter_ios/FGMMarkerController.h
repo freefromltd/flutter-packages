@@ -32,9 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
       clusterManagersController:(nullable FGMClusterManagersController *)clusterManagersController
                   assetProvider:(NSObject<FGMAssetProvider> *)assetProvider
                      markerType:(FGMPlatformMarkerType)markerType;
-- (void)addMarkers:(NSArray<FGMPlatformMarker *> *)markersToAdd;
-- (void)changeMarkers:(NSArray<FGMPlatformMarker *> *)markersToChange;
-- (void)removeMarkersWithIdentifiers:(NSArray<NSString *> *)identifiers;
+- (BOOL)addMarkers:(NSArray<FGMPlatformMarker *> *)markersToAdd;
+- (BOOL)changeMarkers:(NSArray<FGMPlatformMarker *> *)markersToChange;
+- (BOOL)removeMarkersWithIdentifiers:(NSArray<NSString *> *)identifiers;
 - (BOOL)didTapMarkerWithIdentifier:(NSString *)identifier;
 - (void)didStartDraggingMarkerWithIdentifier:(NSString *)identifier
                                     location:(CLLocationCoordinate2D)coordinate;

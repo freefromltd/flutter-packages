@@ -32,6 +32,7 @@ export 'package:google_maps_flutter_platform_interface/google_maps_flutter_platf
         CircleId,
         Cluster,
         ClusterManager,
+        ClusterStyle,
         ClusterManagerId,
         GroundOverlay,
         GroundOverlayId,

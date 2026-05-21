@@ -29,6 +29,7 @@ class AdvancedMarker extends Marker {
     super.rotation,
     super.visible,
     super.clusterManagerId,
+    super.itemCount,
     super.onTap,
     super.onDrag,
     super.onDragStart,
@@ -67,6 +68,7 @@ class AdvancedMarker extends Marker {
     ClusterManagerId? clusterManagerIdParam,
     MarkerCollisionBehavior? collisionBehaviorParam,
     double? altitudeParam,
+    int? itemCountParam,
   }) {
     return AdvancedMarker(
       markerId: markerId,
@@ -87,6 +89,7 @@ class AdvancedMarker extends Marker {
       onDragEnd: onDragEndParam ?? onDragEnd,
       clusterManagerId: clusterManagerIdParam ?? clusterManagerId,
       collisionBehavior: collisionBehaviorParam ?? collisionBehavior,
+      itemCount: itemCountParam ?? itemCount,
     );
   }
 
@@ -110,6 +113,7 @@ class AdvancedMarker extends Marker {
       'collisionBehavior': collisionBehavior.index,
       'anchor': _offsetToJson(anchor),
       if (clusterManagerIdValue != null) 'clusterManagerId': clusterManagerIdValue,
+      if (itemCount != null) 'itemCount': itemCount!,
     };
   }
 
@@ -135,7 +139,8 @@ class AdvancedMarker extends Marker {
         visible == other.visible &&
         zIndex == other.zIndex &&
         clusterManagerId == other.clusterManagerId &&
-        collisionBehavior == other.collisionBehavior;
+        collisionBehavior == other.collisionBehavior &&
+        itemCount == other.itemCount;
   }
 
   @override
@@ -148,7 +153,7 @@ class AdvancedMarker extends Marker {
         'icon: $icon, infoWindow: $infoWindow, position: $position, rotation: $rotation, '
         'visible: $visible, zIndex: $zIndex, onTap: $onTap, onDragStart: $onDragStart, '
         'onDrag: $onDrag, onDragEnd: $onDragEnd, clusterManagerId: $clusterManagerId, '
-        'collisionBehavior: $collisionBehavior}';
+        'collisionBehavior: $collisionBehavior, itemCount: $itemCount}';
   }
 }
 

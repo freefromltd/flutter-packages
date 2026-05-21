@@ -3,6 +3,7 @@ description: A Flutter plugin for integrating Google Maps in iOS and Android app
 repository: https://github.com/flutter/packages/tree/main/packages/google_maps_flutter/google_maps_flutter
 issue_tracker: https://github.com/flutter/flutter/issues?q=is%3Aissue+is%3Aopen+label%3A%22p%3A+maps%22
 version: 2.18.1
+resolution: workspace
 
 environment:
   sdk: ^3.11.0
@@ -41,3 +42,4 @@ topics:
 # The example deliberately includes limited-use secrets.
 false_secrets:
   - /example/web/index.html
+

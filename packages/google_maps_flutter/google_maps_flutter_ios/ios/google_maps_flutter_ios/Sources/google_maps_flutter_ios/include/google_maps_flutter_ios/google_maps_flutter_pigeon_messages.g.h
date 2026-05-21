@@ -327,8 +327,26 @@ typedef NS_ENUM(NSUInteger, FGMPlatformMapBitmapScaling) {
 @interface FGMPlatformClusterManager : NSObject
 /// `init` unavailable to enforce nonnull fields, see the `make` class method.
 - (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)makeWithIdentifier:(NSString *)identifier;
++ (instancetype)makeWithIdentifier:(NSString *)identifier
+                       maxDistance:(nullable NSNumber *)maxDistance
+                    minClusterSize:(nullable NSNumber *)minClusterSize
+                         coreColor:(nullable NSNumber *)coreColor
+                       strokeColor:(nullable NSNumber *)strokeColor
+                    outerRingColor:(nullable NSNumber *)outerRingColor
+                         textColor:(nullable NSNumber *)textColor
+                        fontFamily:(nullable NSString *)fontFamily
+                          fontSize:(nullable NSNumber *)fontSize
+                        circleSize:(nullable NSNumber *)circleSize;
 @property(nonatomic, copy) NSString *identifier;
+@property(nonatomic, strong, nullable) NSNumber *maxDistance;
+@property(nonatomic, strong, nullable) NSNumber *minClusterSize;
+@property(nonatomic, strong, nullable) NSNumber *coreColor;
+@property(nonatomic, strong, nullable) NSNumber *strokeColor;
+@property(nonatomic, strong, nullable) NSNumber *outerRingColor;
+@property(nonatomic, strong, nullable) NSNumber *textColor;
+@property(nonatomic, copy, nullable) NSString *fontFamily;
+@property(nonatomic, strong, nullable) NSNumber *fontSize;
+@property(nonatomic, strong, nullable) NSNumber *circleSize;
 @end
 
 /// Pigeon equivalent of the Marker class.
@@ -348,7 +366,8 @@ typedef NS_ENUM(NSUInteger, FGMPlatformMapBitmapScaling) {
                        zIndex:(NSInteger)zIndex
                      markerId:(NSString *)markerId
              clusterManagerId:(nullable NSString *)clusterManagerId
-            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior;
+            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior
+                    itemCount:(nullable NSNumber *)itemCount;
 @property(nonatomic, assign) double alpha;
 @property(nonatomic, strong) FGMPlatformPoint *anchor;
 @property(nonatomic, assign) BOOL consumeTapEvents;
@@ -363,6 +382,7 @@ typedef NS_ENUM(NSUInteger, FGMPlatformMapBitmapScaling) {
 @property(nonatomic, copy) NSString *markerId;
 @property(nonatomic, copy, nullable) NSString *clusterManagerId;
 @property(nonatomic, strong, nullable) FGMPlatformMarkerCollisionBehaviorBox *collisionBehavior;
+@property(nonatomic, strong, nullable) NSNumber *itemCount;
 @end
 
 /// Pigeon equivalent of the Polygon class.

@@ -717,12 +717,15 @@
                      changing:(nonnull NSArray<FGMPlatformMarker *> *)toChange
                      removing:(nonnull NSArray<NSString *> *)idsToRemove
                         error:(FlutterError *_Nullable __autoreleasing *_Nonnull)error {
-  [self.controller.markersController addMarkers:toAdd];
-  [self.controller.markersController changeMarkers:toChange];
-  [self.controller.markersController removeMarkersWithIdentifiers:idsToRemove];
+  BOOL clusterChanged = NO;
+  clusterChanged |= [self.controller.markersController addMarkers:toAdd];
+  clusterChanged |= [self.controller.markersController changeMarkers:toChange];
+  clusterChanged |= [self.controller.markersController removeMarkersWithIdentifiers:idsToRemove];
 
-  // Invoke clustering after markers are added.
-  [self.controller.clusterManagersController invokeClusteringForEachClusterManager];
+  // Invoke clustering after markers are added/changed/removed.
+  if (clusterChanged) {
+    [self.controller.clusterManagersController invokeClusteringForEachClusterManager];
+  }
 }
 
 - (void)updateClusterManagersByAdding:(nonnull NSArray<FGMPlatformClusterManager *> *)toAdd

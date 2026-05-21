@@ -134,13 +134,15 @@ class MarkersController {
   }
 
   func add(_ markersToAdd: [PlatformMarker]) {
+    var clusterChanged = false
     for marker in markersToAdd {
-      addMarker(marker)
+      clusterChanged = addMarker(marker) || clusterChanged
     }
+    return clusterChanged
   }
 
   private func addMarker(_ markerToAdd: PlatformMarker) {
-    guard let mapView = mapView else { return }
+    guard let mapView = mapView else { return false }
     let position = markerToAdd.position.toCLLocationCoordinate2D()
     let markerIdentifier = markerToAdd.markerId
     let clusterManagerIdentifier = markerToAdd.clusterManagerId
@@ -161,23 +163,28 @@ class MarkersController {
       screenScale: getScreenScale()
     )
 
+    var addedToCluster = false
     if let clusterManagerIdentifier = clusterManagerIdentifier {
       let clusterManager = clusterManagersController?.clusterManager(
         withIdentifier: clusterManagerIdentifier)
       clusterManager?.add(marker)
+      addedToCluster = true
     }
     markerIdentifierToController[markerIdentifier] = controller
+    return addedToCluster
   }
 
-  func change(_ markersToChange: [PlatformMarker]) {
+  func change(_ markersToChange: [PlatformMarker]) -> Bool {
+    var clusterChanged = false
     for marker in markersToChange {
-      changeMarker(marker)
+      clusterChanged = changeMarker(marker) || clusterChanged
     }
+    return clusterChanged
   }
 
-  private func changeMarker(_ markerToChange: PlatformMarker) {
+  private func changeMarker(_ markerToChange: PlatformMarker) -> Bool {
     let markerIdentifier = markerToChange.markerId
-    guard let controller = markerIdentifierToController[markerIdentifier] else { return }
+    guard let controller = markerIdentifierToController[markerIdentifier] else { return false }
 
     let clusterManagerIdentifier = markerToChange.clusterManagerId
     let previousClusterManagerIdentifier = controller.clusterManagerIdentifier
@@ -187,32 +194,41 @@ class MarkersController {
       screenScale: getScreenScale()
     )
 
+    var clusterChanged = false
     if let previousId = previousClusterManagerIdentifier, previousId != clusterManagerIdentifier {
       let clusterManager = clusterManagersController?.clusterManager(withIdentifier: previousId)
       clusterManager?.remove(controller.marker)
+      clusterChanged = true
     }
     if let newId = clusterManagerIdentifier, newId != previousClusterManagerIdentifier {
       let clusterManager = clusterManagersController?.clusterManager(withIdentifier: newId)
       clusterManager?.add(controller.marker)
+      clusterChanged = true
     }
+    return clusterChanged
   }
 
-  func removeMarkers(withIdentifiers identifiers: [String]) {
+  func removeMarkers(withIdentifiers identifiers: [String]) -> Bool {
+    var clusterChanged = false
     for identifier in identifiers {
-      removeMarker(identifier)
+      clusterChanged = removeMarker(identifier) || clusterChanged
     }
+    return clusterChanged
   }
 
-  private func removeMarker(_ identifier: String) {
-    guard let controller = markerIdentifierToController[identifier] else { return }
+  private func removeMarker(_ identifier: String) -> Bool {
+    guard let controller = markerIdentifierToController[identifier] else { return false }
+    var removedFromCluster = false
     if let clusterManagerIdentifier = controller.clusterManagerIdentifier {
       let clusterManager = clusterManagersController?.clusterManager(
         withIdentifier: clusterManagerIdentifier)
       clusterManager?.remove(controller.marker)
+      removedFromCluster = true
     } else {
       controller.removeMarker()
     }
     markerIdentifierToController.removeValue(forKey: identifier)
+    return removedFromCluster
   }
 
   func didTapMarker(withIdentifier identifier: String) -> Bool {
