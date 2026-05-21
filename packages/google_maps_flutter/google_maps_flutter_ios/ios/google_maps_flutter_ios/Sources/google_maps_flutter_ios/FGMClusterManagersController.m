@@ -4,8 +4,118 @@
 
 #import "FGMClusterManagersController.h"
 
+#import <UIKit/UIKit.h>
 #import "FGMConversionUtils.h"
 #import "FGMMarkerUserData.h"
+
+@interface FGMClusterIconGenerator : NSObject <GMUClusterIconGenerator>
+- (instancetype)initWithStyle:(FGMPlatformClusterManager *)clusterStyle;
+@end
+
+@implementation FGMClusterIconGenerator {
+  FGMPlatformClusterManager *_clusterStyle;
+  NSMutableDictionary<NSNumber *, UIImage *> *_iconCache;
+}
+
+- (instancetype)initWithStyle:(FGMPlatformClusterManager *)clusterStyle {
+  self = [super init];
+  if (self) {
+    _clusterStyle = clusterStyle;
+    _iconCache = [[NSMutableDictionary alloc] init];
+  }
+  return self;
+}
+
+- (UIImage *)iconForSize:(NSUInteger)size {
+  NSNumber *key = @(size);
+  UIImage *cached = _iconCache[key];
+  if (cached) {
+    return cached;
+  }
+
+  CGFloat circleSizeVal = _clusterStyle.circleSize != nil ? _clusterStyle.circleSize.doubleValue : 44.0;
+  circleSizeVal += 8.0;
+  CGSize imageSize = CGSizeMake(circleSizeVal, circleSizeVal);
+  UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0.0);
+  CGContextRef context = UIGraphicsGetCurrentContext();
+
+  CGFloat radius = circleSizeVal / 2.0;
+
+  CGContextSaveGState(context);
+  uint32_t outerColorVal = _clusterStyle.outerRingColor != nil ? (uint32_t)_clusterStyle.outerRingColor.unsignedIntValue : 0x22007AFF;
+  UIColor *outerColor = [UIColor colorWithRed:((outerColorVal >> 16) & 0xFF) / 255.0
+                                        green:((outerColorVal >> 8) & 0xFF) / 255.0
+                                         blue:(outerColorVal & 0xFF) / 255.0
+                                        alpha:((outerColorVal >> 24) & 0xFF) / 255.0];
+  [outerColor setFill];
+  CGContextFillEllipseInRect(context, CGRectMake(0, 0, circleSizeVal, circleSizeVal));
+  CGContextRestoreGState(context);
+
+  CGContextSaveGState(context);
+  CGFloat outerRingWidth = 8.0;
+  CGFloat middleRadius = radius - outerRingWidth;
+  if (middleRadius > 0) {
+    uint32_t strokeColorVal = _clusterStyle.strokeColor != nil ? (uint32_t)_clusterStyle.strokeColor.unsignedIntValue : 0xFFFFFFFF;
+    UIColor *strokeColor = [UIColor colorWithRed:((strokeColorVal >> 16) & 0xFF) / 255.0
+                                           green:((strokeColorVal >> 8) & 0xFF) / 255.0
+                                            blue:(strokeColorVal & 0xFF) / 255.0
+                                           alpha:((strokeColorVal >> 24) & 0xFF) / 255.0];
+    [strokeColor setFill];
+    CGContextFillEllipseInRect(context, CGRectMake(radius - middleRadius, radius - middleRadius, middleRadius * 2.0, middleRadius * 2.0));
+  }
+  CGContextRestoreGState(context);
+
+  CGContextSaveGState(context);
+  CGFloat strokeWidth = 2.0;
+  CGFloat innerRadius = middleRadius - strokeWidth;
+  if (innerRadius > 0) {
+    uint32_t coreColorVal = _clusterStyle.coreColor != nil ? (uint32_t)_clusterStyle.coreColor.unsignedIntValue : 0xFF007AFF;
+    UIColor *coreColor = [UIColor colorWithRed:((coreColorVal >> 16) & 0xFF) / 255.0
+                                         green:((coreColorVal >> 8) & 0xFF) / 255.0
+                                          blue:(coreColorVal & 0xFF) / 255.0
+                                         alpha:((coreColorVal >> 24) & 0xFF) / 255.0];
+    [coreColor setFill];
+    CGContextFillEllipseInRect(context, CGRectMake(radius - innerRadius, radius - innerRadius, innerRadius * 2.0, innerRadius * 2.0));
+  }
+  CGContextRestoreGState(context);
+
+  NSString *text = [NSString stringWithFormat:@"%lu", (unsigned long)size];
+  uint32_t textColorVal = _clusterStyle.textColor != nil ? (uint32_t)_clusterStyle.textColor.unsignedIntValue : 0xFFFFFFFF;
+  UIColor *textColor = [UIColor colorWithRed:((textColorVal >> 16) & 0xFF) / 255.0
+                                       green:((textColorVal >> 8) & 0xFF) / 255.0
+                                        blue:(textColorVal & 0xFF) / 255.0
+                                       alpha:((textColorVal >> 24) & 0xFF) / 255.0];
+  CGFloat fontSizeVal = _clusterStyle.fontSize != nil ? _clusterStyle.fontSize.doubleValue : 14.0;
+  
+  UIFont *font = nil;
+  if (_clusterStyle.fontFamily != nil) {
+    font = [UIFont fontWithName:_clusterStyle.fontFamily size:fontSizeVal];
+  }
+  if (!font) {
+    font = [UIFont boldSystemFontOfSize:fontSizeVal];
+  }
+
+  NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+  paragraphStyle.alignment = NSTextAlignmentCenter;
+
+  NSDictionary *attributes = @{
+    NSFontAttributeName: font,
+    NSForegroundColorAttributeName: textColor,
+    NSParagraphStyleAttributeName: paragraphStyle
+  };
+
+  CGSize textSize = [text sizeWithAttributes:attributes];
+  CGRect textRect = CGRectMake(0, radius - (textSize.height / 2.0), circleSizeVal, textSize.height);
+  [text drawInRect:textRect withAttributes:attributes];
+
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+
+  _iconCache[key] = image;
+  return image;
+}
+
+@end
 
 @interface FGMClusterManagersController ()
 
@@ -35,20 +145,63 @@
 
 - (void)addClusterManagers:(NSArray<FGMPlatformClusterManager *> *)clusterManagersToAdd {
   for (FGMPlatformClusterManager *clusterManager in clusterManagersToAdd) {
-    NSString *identifier = clusterManager.identifier;
-    [self addClusterManager:identifier];
+    [self addClusterManager:clusterManager];
   }
 }
 
-- (void)addClusterManager:(NSString *)identifier {
-  id<GMUClusterAlgorithm> algorithm = [[GMUNonHierarchicalDistanceBasedAlgorithm alloc] init];
-  id<GMUClusterIconGenerator> iconGenerator = [[GMUDefaultClusterIconGenerator alloc] init];
+- (void)addClusterManager:(FGMPlatformClusterManager *)clusterManager {
+  GMUClusterManager *existingManager = self.clusterManagerIdentifierToManagers[clusterManager.identifier];
+  if (existingManager) {
+    id<GMUClusterAlgorithm> algorithm;
+    if (clusterManager.maxDistance != nil) {
+      algorithm = [[GMUNonHierarchicalDistanceBasedAlgorithm alloc] initWithClusterDistancePoints:clusterManager.maxDistance.unsignedIntegerValue];
+    } else {
+      algorithm = [[GMUNonHierarchicalDistanceBasedAlgorithm alloc] init];
+    }
+    [existingManager setValue:algorithm forKey:@"algorithm"];
+    
+    id<GMUClusterIconGenerator> iconGenerator;
+    if (clusterManager.coreColor != nil) {
+      iconGenerator = [[FGMClusterIconGenerator alloc] initWithStyle:clusterManager];
+    } else {
+      iconGenerator = [[GMUDefaultClusterIconGenerator alloc] init];
+    }
+    
+    id<GMUClusterRenderer> renderer =
+        [[GMUDefaultClusterRenderer alloc] initWithMapView:self.mapView
+                                      clusterIconGenerator:iconGenerator];
+    if ([renderer isKindOfClass:[GMUDefaultClusterRenderer class]]) {
+      if (clusterManager.minClusterSize != nil) {
+        ((GMUDefaultClusterRenderer *)renderer).minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
+      }
+    }
+    [existingManager setValue:renderer forKey:@"renderer"];
+    [existingManager cluster];
+    return;
+  }
+
+  id<GMUClusterAlgorithm> algorithm;
+  if (clusterManager.maxDistance != nil) {
+    algorithm = [[GMUNonHierarchicalDistanceBasedAlgorithm alloc] initWithClusterDistancePoints:clusterManager.maxDistance.unsignedIntegerValue];
+  } else {
+    algorithm = [[GMUNonHierarchicalDistanceBasedAlgorithm alloc] init];
+  }
+  id<GMUClusterIconGenerator> iconGenerator;
+  if (clusterManager.coreColor != nil) {
+    iconGenerator = [[FGMClusterIconGenerator alloc] initWithStyle:clusterManager];
+  } else {
+    iconGenerator = [[GMUDefaultClusterIconGenerator alloc] init];
+  }
   id<GMUClusterRenderer> renderer =
       [[GMUDefaultClusterRenderer alloc] initWithMapView:self.mapView
                                     clusterIconGenerator:iconGenerator];
-  self.clusterManagerIdentifierToManagers[identifier] =
+  if ([renderer isKindOfClass:[GMUDefaultClusterRenderer class]]) {
+    if (clusterManager.minClusterSize != nil) {
+      ((GMUDefaultClusterRenderer *)renderer).minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
+    }
+  }
+  self.clusterManagerIdentifierToManagers[clusterManager.identifier] =
       [[GMUClusterManager alloc] initWithMap:self.mapView algorithm:algorithm renderer:renderer];
-  ;
 }
 
 - (void)removeClusterManagersWithIdentifiers:(NSArray<NSString *> *)identifiers {

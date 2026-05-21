@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm;
 import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultAdvancedMarkersClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -109,29 +110,60 @@ class ClusterManagersController
   /** Adds new ClusterManagers to the controller. */
   void addClusterManagers(@NonNull List<PlatformClusterManager> clusterManagersToAdd) {
     for (PlatformClusterManager clusterToAdd : clusterManagersToAdd) {
-      addClusterManager(clusterToAdd.getIdentifier());
+      addClusterManager(clusterToAdd);
     }
   }
 
-  /** Adds new ClusterManager to the controller. */
-  void addClusterManager(String clusterManagerId) {
+  void addClusterManager(@NonNull PlatformClusterManager clusterToAdd) {
     ClusterManager<MarkerBuilder> clusterManager =
-        new ClusterManager<>(context, googleMap, markerManager);
-    initializeRenderer(clusterManager);
-    clusterManagerIdToManager.put(clusterManagerId, clusterManager);
+        clusterManagerIdToManager.get(clusterToAdd.getIdentifier());
+    if (clusterManager != null) {
+      if (clusterToAdd.getMaxDistance() != null) {
+        NonHierarchicalDistanceBasedAlgorithm<MarkerBuilder> algorithm =
+            new NonHierarchicalDistanceBasedAlgorithm<>();
+        algorithm.setMaxDistanceBetweenClusteredItems((int) Math.round(clusterToAdd.getMaxDistance()));
+        clusterManager.setAlgorithm(algorithm);
+      }
+      ClusterRenderer<MarkerBuilder> renderer = clusterManager.getRenderer();
+      if (renderer instanceof MarkerClusterRenderer) {
+        ((MarkerClusterRenderer<MarkerBuilder>) renderer).setClusterStyle(clusterToAdd);
+      } else if (renderer instanceof AdvancedMarkerClusterRenderer) {
+        ((AdvancedMarkerClusterRenderer<MarkerBuilder>) renderer).setClusterStyle(clusterToAdd);
+      }
+      Long minClusterSize = clusterToAdd.getMinClusterSize();
+      if (minClusterSize != null) {
+        if (renderer instanceof DefaultClusterRenderer) {
+          ((DefaultClusterRenderer<MarkerBuilder>) renderer).setMinClusterSize(minClusterSize.intValue());
+        }
+      }
+      clusterManager.cluster();
+      return;
+    }
+
+    clusterManager = new ClusterManager<>(context, googleMap, markerManager);
+    if (clusterToAdd.getMaxDistance() != null) {
+      NonHierarchicalDistanceBasedAlgorithm<MarkerBuilder> algorithm =
+          new NonHierarchicalDistanceBasedAlgorithm<>();
+      algorithm.setMaxDistanceBetweenClusteredItems((int) Math.round(clusterToAdd.getMaxDistance()));
+      clusterManager.setAlgorithm(algorithm);
+    }
+    initializeRenderer(clusterManager, clusterToAdd);
+    clusterManagerIdToManager.put(clusterToAdd.getIdentifier(), clusterManager);
   }
 
-  /**
-   * Initializes cluster renderer based on marker type. AdvancedMarkerCluster renderer is used for
-   * advanced markers and MarkerClusterRenderer is used for default markers.
-   */
-  private void initializeRenderer(ClusterManager<MarkerBuilder> clusterManager) {
+  private void initializeRenderer(ClusterManager<MarkerBuilder> clusterManager, PlatformClusterManager clusterToAdd) {
     final ClusterRenderer<MarkerBuilder> clusterRenderer =
         switch (markerType) {
           case ADVANCED_MARKER ->
-              new AdvancedMarkerClusterRenderer<>(context, googleMap, clusterManager, this);
-          default -> new MarkerClusterRenderer<>(context, googleMap, clusterManager, this);
+              new AdvancedMarkerClusterRenderer<>(context, googleMap, clusterManager, this, clusterToAdd);
+          default -> new MarkerClusterRenderer<>(context, googleMap, clusterManager, this, clusterToAdd);
         };
+    Long minClusterSize = clusterToAdd.getMinClusterSize();
+    if (minClusterSize != null) {
+      if (clusterRenderer instanceof DefaultClusterRenderer) {
+        ((DefaultClusterRenderer<MarkerBuilder>) clusterRenderer).setMinClusterSize(minClusterSize.intValue());
+      }
+    }
     clusterManager.setRenderer(clusterRenderer);
     initListenersForClusterManager(
         clusterManager, this, clusterItemClickListener, clusterItemInfoWindowClickListener);
@@ -252,22 +284,31 @@ class ClusterManagersController
    */
   @VisibleForTesting
   static class MarkerClusterRenderer<T extends MarkerBuilder> extends DefaultClusterRenderer<T> {
+    private final Context context;
     private final ClusterManagersController clusterManagersController;
+    private PlatformClusterManager clusterStyle;
+    private final Map<Integer, com.google.android.gms.maps.model.BitmapDescriptor> iconCache = new HashMap<>();
 
     public MarkerClusterRenderer(
         Context context,
         GoogleMap map,
         ClusterManager<T> clusterManager,
-        ClusterManagersController clusterManagersController) {
+        ClusterManagersController clusterManagersController,
+        PlatformClusterManager clusterStyle) {
       super(context, map, clusterManager);
+      this.context = context;
       this.clusterManagersController = clusterManagersController;
+      this.clusterStyle = clusterStyle;
+    }
+
+    public void setClusterStyle(PlatformClusterManager clusterStyle) {
+      this.clusterStyle = clusterStyle;
+      this.iconCache.clear();
     }
 
     @Override
     protected void onBeforeClusterItemRendered(
         @NonNull T item, @NonNull MarkerOptions markerOptions) {
-      // Builds new markerOptions for new marker created by the ClusterRenderer under
-      // ClusterManager.
       item.update(markerOptions);
     }
 
@@ -276,22 +317,55 @@ class ClusterManagersController
       super.onClusterItemRendered(item, marker);
       clusterManagersController.onClusterItemRendered(item, marker);
     }
+
+    @Override
+    protected void onBeforeClusterRendered(
+        @NonNull Cluster<T> cluster, @NonNull MarkerOptions markerOptions) {
+      if (clusterStyle.getCoreColor() != null) {
+        com.google.android.gms.maps.model.BitmapDescriptor icon =
+            getClusterIcon(this.context, clusterStyle, cluster, iconCache);
+        markerOptions.icon(icon);
+      } else {
+        super.onBeforeClusterRendered(cluster, markerOptions);
+      }
+    }
+
+    @Override
+    protected void onClusterUpdated(
+        @NonNull Cluster<T> cluster, @NonNull Marker marker) {
+      if (clusterStyle.getCoreColor() != null) {
+        com.google.android.gms.maps.model.BitmapDescriptor icon =
+            getClusterIcon(this.context, clusterStyle, cluster, iconCache);
+        marker.setIcon(icon);
+      } else {
+        super.onClusterUpdated(cluster, marker);
+      }
+    }
   }
 
-  /** AdvancedMarkerClusterRenderer is a ClusterRenderer that supports AdvancedMarkers. */
   @VisibleForTesting
   static class AdvancedMarkerClusterRenderer<T extends MarkerBuilder>
       extends DefaultAdvancedMarkersClusterRenderer<T> {
-
+    private final Context context;
     private final ClusterManagersController clusterManagersController;
+    private PlatformClusterManager clusterStyle;
+    private final Map<Integer, com.google.android.gms.maps.model.BitmapDescriptor> iconCache = new HashMap<>();
 
     public AdvancedMarkerClusterRenderer(
         Context context,
         GoogleMap map,
         ClusterManager<T> clusterManager,
-        ClusterManagersController clusterManagersController) {
+        ClusterManagersController clusterManagersController,
+        PlatformClusterManager clusterStyle) {
       super(context, map, clusterManager);
+      this.context = context;
       this.clusterManagersController = clusterManagersController;
+      this.clusterStyle = clusterStyle;
+    }
+
+    public void setClusterStyle(PlatformClusterManager clusterStyle) {
+      this.clusterStyle = clusterStyle;
+      this.iconCache.clear();
     }
 
     @Override
@@ -305,6 +379,93 @@ class ClusterManagersController
       super.onClusterItemRendered(item, marker);
       clusterManagersController.onClusterItemRendered(item, marker);
     }
+
+    @Override
+    protected void onBeforeClusterRendered(
+        @NonNull Cluster<T> cluster, @NonNull AdvancedMarkerOptions markerOptions) {
+      if (clusterStyle.getCoreColor() != null) {
+        com.google.android.gms.maps.model.BitmapDescriptor icon =
+            getClusterIcon(this.context, clusterStyle, cluster, iconCache);
+        markerOptions.icon(icon);
+      } else {
+        super.onBeforeClusterRendered(cluster, markerOptions);
+      }
+    }
+
+    @Override
+    protected void onClusterUpdated(
+        @NonNull Cluster<T> cluster, @NonNull com.google.android.gms.maps.model.AdvancedMarker marker) {
+      if (clusterStyle.getCoreColor() != null) {
+        com.google.android.gms.maps.model.BitmapDescriptor icon =
+            getClusterIcon(this.context, clusterStyle, cluster, iconCache);
+        marker.setIcon(icon);
+      } else {
+        super.onClusterUpdated(cluster, marker);
+      }
+    }
+  }
+
+  static com.google.android.gms.maps.model.BitmapDescriptor getClusterIcon(
+      Context context,
+      PlatformClusterManager clusterStyle,
+      Cluster<?> cluster,
+      Map<Integer, com.google.android.gms.maps.model.BitmapDescriptor> iconCache) {
+    int count = cluster.getSize();
+    com.google.android.gms.maps.model.BitmapDescriptor cached = iconCache.get(count);
+    if (cached != null) {
+      return cached;
+    }
+
+    float density = context.getResources().getDisplayMetrics().density;
+    double circleSizeVal = clusterStyle.getCircleSize() != null ? clusterStyle.getCircleSize() : 44.0;
+    circleSizeVal += 8.0;
+    float sizePx = (float) (circleSizeVal * density);
+    int size = Math.round(sizePx);
+
+    android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+    android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+
+    float radius = sizePx / 2.0f;
+
+    android.graphics.Paint paint = new android.graphics.Paint();
+    paint.setAntiAlias(true);
+    paint.setStyle(android.graphics.Paint.Style.FILL);
+    int outerRingColor = clusterStyle.getOuterRingColor() != null ? clusterStyle.getOuterRingColor().intValue() : 0x22007AFF;
+    paint.setColor(outerRingColor);
+    canvas.drawCircle(radius, radius, radius, paint);
+
+    float outerRingWidth = 8.0f * density;
+    float middleRadius = radius - outerRingWidth;
+    if (middleRadius > 0) {
+      int strokeColor = clusterStyle.getStrokeColor() != null ? clusterStyle.getStrokeColor().intValue() : 0xFFFFFFFF;
+      paint.setColor(strokeColor);
+      canvas.drawCircle(radius, radius, middleRadius, paint);
+    }
+
+    float strokeWidth = 2.0f * density;
+    float innerRadius = middleRadius - strokeWidth;
+    if (innerRadius > 0) {
+      int coreColor = clusterStyle.getCoreColor() != null ? clusterStyle.getCoreColor().intValue() : 0xFF007AFF;
+      paint.setColor(coreColor);
+      canvas.drawCircle(radius, radius, innerRadius, paint);
+    }
+
+    paint.setColor(clusterStyle.getTextColor() != null ? clusterStyle.getTextColor().intValue() : 0xFFFFFFFF);
+    double fontSizeVal = clusterStyle.getFontSize() != null ? clusterStyle.getFontSize() : 14.0;
+    paint.setTextSize((float) (fontSizeVal * density));
+    paint.setTextAlign(android.graphics.Paint.Align.CENTER);
+    if (clusterStyle.getFontFamily() != null) {
+      paint.setTypeface(android.graphics.Typeface.create(clusterStyle.getFontFamily(), android.graphics.Typeface.BOLD));
+    } else {
+      paint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD));
+    }
+
+    float yOffset = (paint.descent() + paint.ascent()) / 2.0f;
+    canvas.drawText(String.valueOf(count), radius, radius - yOffset, paint);
+
+    com.google.android.gms.maps.model.BitmapDescriptor descriptor = com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(bitmap);
+    iconCache.put(count, descriptor);
+    return descriptor;
   }
 
   /** Interface for handling situations where clusterManager adds new visible marker to the map. */

@@ -144,13 +144,15 @@
   return self;
 }
 
-- (void)addMarkers:(NSArray<FGMPlatformMarker *> *)markersToAdd {
+- (BOOL)addMarkers:(NSArray<FGMPlatformMarker *> *)markersToAdd {
+  BOOL clusterChanged = NO;
   for (FGMPlatformMarker *marker in markersToAdd) {
-    [self addMarker:marker];
+    clusterChanged |= [self addMarker:marker];
   }
+  return clusterChanged;
 }
 
-- (void)addMarker:(FGMPlatformMarker *)markerToAdd {
+- (BOOL)addMarker:(FGMPlatformMarker *)markerToAdd {
   CLLocationCoordinate2D position = FGMGetCoordinateForPigeonLatLng(markerToAdd.position);
   NSString *markerIdentifier = markerToAdd.markerId;
   NSString *clusterManagerIdentifier = markerToAdd.clusterManagerId;
@@ -163,28 +165,33 @@
   [controller updateFromPlatformMarker:markerToAdd
                          assetProvider:self.assetProvider
                            screenScale:[self getScreenScale]];
+  BOOL addedToCluster = NO;
   if (clusterManagerIdentifier) {
     GMUClusterManager *clusterManager =
         [_clusterManagersController clusterManagerWithIdentifier:clusterManagerIdentifier];
     if ([marker conformsToProtocol:@protocol(GMUClusterItem)]) {
       [clusterManager addItem:(id<GMUClusterItem>)marker];
+      addedToCluster = YES;
     }
   }
   self.markerIdentifierToController[markerIdentifier] = controller;
+  return addedToCluster;
 }
 
-- (void)changeMarkers:(NSArray<FGMPlatformMarker *> *)markersToChange {
+- (BOOL)changeMarkers:(NSArray<FGMPlatformMarker *> *)markersToChange {
+  BOOL clusterChanged = NO;
   for (FGMPlatformMarker *marker in markersToChange) {
-    [self changeMarker:marker];
+    clusterChanged |= [self changeMarker:marker];
   }
+  return clusterChanged;
 }
 
-- (void)changeMarker:(FGMPlatformMarker *)markerToChange {
+- (BOOL)changeMarker:(FGMPlatformMarker *)markerToChange {
   NSString *markerIdentifier = markerToChange.markerId;
 
   FGMMarkerController *controller = self.markerIdentifierToController[markerIdentifier];
   if (!controller) {
-    return;
+    return NO;
   }
 
   NSString *clusterManagerIdentifier = markerToChange.clusterManagerId;
@@ -193,6 +200,7 @@
                          assetProvider:self.assetProvider
                            screenScale:[self getScreenScale]];
 
+  BOOL clusterChanged = NO;
   if ([controller.marker conformsToProtocol:@protocol(GMUClusterItem)]) {
     if (previousClusterManagerIdentifier &&
         ![clusterManagerIdentifier isEqualToString:previousClusterManagerIdentifier]) {
@@ -201,6 +209,7 @@
       GMUClusterManager *clusterManager = [_clusterManagersController
           clusterManagerWithIdentifier:previousClusterManagerIdentifier];
       [clusterManager removeItem:(id<GMUClusterItem>)controller.marker];
+      clusterChanged = YES;
     }
 
     if (clusterManagerIdentifier &&
@@ -209,30 +218,37 @@
       GMUClusterManager *clusterManager =
           [_clusterManagersController clusterManagerWithIdentifier:clusterManagerIdentifier];
       [clusterManager addItem:(id<GMUClusterItem>)controller.marker];
+      clusterChanged = YES;
     }
   }
+  return clusterChanged;
 }
 
-- (void)removeMarkersWithIdentifiers:(NSArray<NSString *> *)identifiers {
+- (BOOL)removeMarkersWithIdentifiers:(NSArray<NSString *> *)identifiers {
+  BOOL clusterChanged = NO;
   for (NSString *identifier in identifiers) {
-    [self removeMarker:identifier];
+    clusterChanged |= [self removeMarker:identifier];
   }
+  return clusterChanged;
 }
 
-- (void)removeMarker:(NSString *)identifier {
+- (BOOL)removeMarker:(NSString *)identifier {
   FGMMarkerController *controller = self.markerIdentifierToController[identifier];
   if (!controller) {
-    return;
+    return NO;
   }
+  BOOL removedFromCluster = NO;
   NSString *clusterManagerIdentifier = [controller clusterManagerIdentifier];
   if (clusterManagerIdentifier) {
     GMUClusterManager *clusterManager =
         [_clusterManagersController clusterManagerWithIdentifier:clusterManagerIdentifier];
     [clusterManager removeItem:(id<GMUClusterItem>)controller.marker];
+    removedFromCluster = YES;
   } else {
     [controller removeMarker];
   }
   [self.markerIdentifierToController removeObjectForKey:identifier];
+  return removedFromCluster;
 }
 
 - (BOOL)didTapMarkerWithIdentifier:(NSString *)identifier {

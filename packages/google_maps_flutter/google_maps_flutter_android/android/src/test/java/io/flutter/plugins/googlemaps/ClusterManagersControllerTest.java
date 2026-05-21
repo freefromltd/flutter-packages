@@ -94,7 +94,7 @@ public class ClusterManagersControllerTest {
 
     when(googleMap.getCameraPosition())
         .thenReturn(CameraPosition.builder().target(new LatLng(0, 0)).build());
-    PlatformClusterManager initialClusterManager = new PlatformClusterManager(clusterManagerId);
+    PlatformClusterManager initialClusterManager = new PlatformClusterManager(clusterManagerId, null, null, null, null, null, null, null, null, null);
     List<PlatformClusterManager> clusterManagersToAdd = new ArrayList<>();
     clusterManagersToAdd.add(initialClusterManager);
     controller.addClusterManagers(clusterManagersToAdd);
@@ -148,13 +148,13 @@ public class ClusterManagersControllerTest {
     advancedController.init(googleMap, markerManager);
 
     PlatformClusterManager initialClusterManager1 =
-        new PlatformClusterManager(defaultClusterManagerId);
+        new PlatformClusterManager(defaultClusterManagerId, null, null, null, null, null, null, null, null, null);
     List<PlatformClusterManager> clusterManagersToAdd1 = new ArrayList<>();
     clusterManagersToAdd1.add(initialClusterManager1);
     defaultController.addClusterManagers(clusterManagersToAdd1);
 
     PlatformClusterManager initialClusterManager2 =
-        new PlatformClusterManager(advancedClusterManagerId);
+        new PlatformClusterManager(advancedClusterManagerId, null, null, null, null, null, null, null, null, null);
     List<PlatformClusterManager> clusterManagersToAdd2 = new ArrayList<>();
     clusterManagersToAdd2.add(initialClusterManager2);
     advancedController.addClusterManagers(clusterManagersToAdd2);
@@ -210,7 +210,7 @@ public class ClusterManagersControllerTest {
 
     when(googleMap.getCameraPosition())
         .thenReturn(CameraPosition.builder().target(new LatLng(0, 0)).build());
-    PlatformClusterManager initialClusterManager = new PlatformClusterManager(clusterManagerId);
+    PlatformClusterManager initialClusterManager = new PlatformClusterManager(clusterManagerId, null, null, null, null, null, null, null, null, null);
     List<PlatformClusterManager> clusterManagersToAdd = new ArrayList<>();
     clusterManagersToAdd.add(initialClusterManager);
     controller.addClusterManagers(clusterManagersToAdd);

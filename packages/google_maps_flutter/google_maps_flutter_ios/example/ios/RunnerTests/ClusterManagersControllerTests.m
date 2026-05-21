@@ -39,7 +39,7 @@
   // Add cluster managers.
   NSString *clusterManagerId = @"cm";
   FGMPlatformClusterManager *clusterManagerToAdd =
-      [FGMPlatformClusterManager makeWithIdentifier:clusterManagerId];
+      [FGMPlatformClusterManager makeWithIdentifier:clusterManagerId maxDistance:nil minClusterSize:nil coreColor:nil strokeColor:nil outerRingColor:nil textColor:nil fontFamily:nil fontSize:nil circleSize:nil];
   [clusterManagersController addClusterManagers:@[ clusterManagerToAdd ]];
 
   // Verify that cluster managers are available

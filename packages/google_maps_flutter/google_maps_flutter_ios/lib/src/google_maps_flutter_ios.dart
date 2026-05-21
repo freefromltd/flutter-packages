@@ -282,9 +282,10 @@ class GoogleMapsFlutterIOS extends GoogleMapsFlutterPlatform {
     required int mapId,
   }) {
     return _hostApi(mapId).updateClusterManagers(
-      clusterManagerUpdates.clusterManagersToAdd
-          .map(_platformClusterManagerFromClusterManager)
-          .toList(),
+      <ClusterManager>{
+        ...clusterManagerUpdates.clusterManagersToAdd,
+        ...clusterManagerUpdates.clusterManagersToChange,
+      }.map(_platformClusterManagerFromClusterManager).toList(),
       clusterManagerUpdates.clusterManagerIdsToRemove
           .map((ClusterManagerId id) => id.value)
           .toList(),
@@ -707,7 +708,18 @@ class GoogleMapsFlutterIOS extends GoogleMapsFlutterPlatform {
   static PlatformClusterManager _platformClusterManagerFromClusterManager(
     ClusterManager clusterManager,
   ) {
-    return PlatformClusterManager(identifier: clusterManager.clusterManagerId.value);
+    return PlatformClusterManager(
+      identifier: clusterManager.clusterManagerId.value,
+      maxDistance: clusterManager.maxDistance,
+      minClusterSize: clusterManager.minClusterSize,
+      coreColor: clusterManager.style?.coreColor.value,
+      strokeColor: clusterManager.style?.strokeColor.value,
+      outerRingColor: clusterManager.style?.outerRingColor.value,
+      textColor: clusterManager.style?.textColor.value,
+      fontFamily: clusterManager.style?.fontFamily,
+      fontSize: clusterManager.style?.fontSize,
+      circleSize: clusterManager.style?.circleSize,
+    );
   }
 
   static PlatformCameraUpdate _platformCameraUpdateFromCameraUpdate(CameraUpdate update) {
