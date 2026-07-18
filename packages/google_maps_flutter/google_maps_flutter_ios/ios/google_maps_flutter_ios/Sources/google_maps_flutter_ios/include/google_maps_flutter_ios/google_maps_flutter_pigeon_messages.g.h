@@ -366,7 +366,8 @@ typedef NS_ENUM(NSUInteger, FGMPlatformMapBitmapScaling) {
                        zIndex:(NSInteger)zIndex
                      markerId:(NSString *)markerId
              clusterManagerId:(nullable NSString *)clusterManagerId
-            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior;
+            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior
+                    itemCount:(nullable NSNumber *)itemCount;
 @property(nonatomic, assign) double alpha;
 @property(nonatomic, strong) FGMPlatformPoint *anchor;
 @property(nonatomic, assign) BOOL consumeTapEvents;
@@ -381,6 +382,7 @@ typedef NS_ENUM(NSUInteger, FGMPlatformMapBitmapScaling) {
 @property(nonatomic, copy) NSString *markerId;
 @property(nonatomic, copy, nullable) NSString *clusterManagerId;
 @property(nonatomic, strong, nullable) FGMPlatformMarkerCollisionBehaviorBox *collisionBehavior;
+@property(nonatomic, strong, nullable) NSNumber *itemCount;
 @end
 
 /// Pigeon equivalent of the Polygon class.

@@ -117,11 +117,14 @@
 
 @end
 
-@interface FGMClusterManagersController ()
+@interface FGMClusterManagersController () <GMUClusterRendererDelegate>
 
 /// A dictionary mapping unique cluster manager identifiers to their corresponding cluster managers.
 @property(strong, nonatomic)
     NSMutableDictionary<NSString *, GMUClusterManager *> *clusterManagerIdentifierToManagers;
+
+@property(strong, nonatomic)
+    NSMutableDictionary<NSString *, id<GMUClusterIconGenerator>> *clusterManagerIdentifierToIconGenerators;
 
 /// The delegate for handling interactions with clusters.
 @property(weak, nonatomic) NSObject<FGMMapEventDelegate> *eventDelegate;
@@ -139,6 +142,7 @@
     _eventDelegate = eventDelegate;
     _mapView = mapView;
     _clusterManagerIdentifierToManagers = [[NSMutableDictionary alloc] init];
+    _clusterManagerIdentifierToIconGenerators = [[NSMutableDictionary alloc] init];
   }
   return self;
 }
@@ -166,11 +170,13 @@
     } else {
       iconGenerator = [[GMUDefaultClusterIconGenerator alloc] init];
     }
+    self.clusterManagerIdentifierToIconGenerators[clusterManager.identifier] = iconGenerator;
     
     id<GMUClusterRenderer> renderer =
         [[GMUDefaultClusterRenderer alloc] initWithMapView:self.mapView
                                       clusterIconGenerator:iconGenerator];
     if ([renderer isKindOfClass:[GMUDefaultClusterRenderer class]]) {
+      ((GMUDefaultClusterRenderer *)renderer).delegate = self;
       if (clusterManager.minClusterSize != nil) {
         ((GMUDefaultClusterRenderer *)renderer).minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
       }
@@ -192,10 +198,12 @@
   } else {
     iconGenerator = [[GMUDefaultClusterIconGenerator alloc] init];
   }
+  self.clusterManagerIdentifierToIconGenerators[clusterManager.identifier] = iconGenerator;
   id<GMUClusterRenderer> renderer =
       [[GMUDefaultClusterRenderer alloc] initWithMapView:self.mapView
                                     clusterIconGenerator:iconGenerator];
   if ([renderer isKindOfClass:[GMUDefaultClusterRenderer class]]) {
+    ((GMUDefaultClusterRenderer *)renderer).delegate = self;
     if (clusterManager.minClusterSize != nil) {
       ((GMUDefaultClusterRenderer *)renderer).minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
     }
@@ -213,6 +221,7 @@
     }
     [clusterManager clearItems];
     [self.clusterManagerIdentifierToManagers removeObjectForKey:identifier];
+    [self.clusterManagerIdentifierToIconGenerators removeObjectForKey:identifier];
   }
 }
 
@@ -260,6 +269,28 @@
   }
   FGMPlatformCluster *platFormCluster = FGMGetPigeonCluster(cluster, clusterManagerId);
   [self.eventDelegate didTapCluster:platFormCluster];
+}
+
+- (void)renderer:(id<GMUClusterRenderer>)renderer willRenderMarker:(GMSMarker *)marker {
+  if ([marker.userData conformsToProtocol:@protocol(GMUCluster)]) {
+    id<GMUCluster> cluster = (id<GMUCluster>)marker.userData;
+    NSString *clusterManagerId = [self clusterManagerIdentifierForCluster:(GMUStaticCluster *)cluster];
+    id<GMUClusterIconGenerator> iconGenerator = nil;
+    if (clusterManagerId != nil) {
+      iconGenerator = self.clusterManagerIdentifierToIconGenerators[clusterManagerId];
+    }
+    if (iconGenerator != nil) {
+      NSUInteger count = 0;
+      for (GMSMarker *item in cluster.items) {
+        if ([item.userData isKindOfClass:[FGMMarkerUserData class]]) {
+          count += ((FGMMarkerUserData *)item.userData).itemCount;
+        } else {
+          count += 1;
+        }
+      }
+      marker.icon = [iconGenerator iconForSize:count];
+    }
+  }
 }
 
 #pragma mark - Private methods

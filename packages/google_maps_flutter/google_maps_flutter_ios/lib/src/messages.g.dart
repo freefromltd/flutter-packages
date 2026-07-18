@@ -911,6 +911,7 @@ class PlatformMarker {
     required this.markerId,
     this.clusterManagerId,
     this.collisionBehavior,
+    this.itemCount,
   });
 
   double alpha;
@@ -941,6 +942,8 @@ class PlatformMarker {
 
   PlatformMarkerCollisionBehavior? collisionBehavior;
 
+  int? itemCount;
+
   List<Object?> _toList() {
     return <Object?>[
       alpha,
@@ -957,6 +960,7 @@ class PlatformMarker {
       markerId,
       clusterManagerId,
       collisionBehavior,
+      itemCount,
     ];
   }
 
@@ -981,6 +985,7 @@ class PlatformMarker {
       markerId: result[11]! as String,
       clusterManagerId: result[12] as String?,
       collisionBehavior: result[13] as PlatformMarkerCollisionBehavior?,
+      itemCount: result[14] as int?,
     );
   }
 

@@ -18,6 +18,7 @@ class MarkerBuilder implements MarkerOptionsSink, ClusterItem {
   private final String clusterManagerId;
   private final String markerId;
   private boolean consumeTapEvents;
+  private int itemCount = 1;
 
   MarkerBuilder(String markerId, String clusterManagerId, @NonNull PlatformMarkerType markerType) {
     switch (markerType) {
@@ -154,5 +155,13 @@ class MarkerBuilder implements MarkerOptionsSink, ClusterItem {
   @Override
   public Float getZIndex() {
     return markerOptions.getZIndex();
+  }
+
+  public int getItemCount() {
+    return itemCount;
+  }
+
+  public void setItemCount(int itemCount) {
+    this.itemCount = itemCount;
   }
 }

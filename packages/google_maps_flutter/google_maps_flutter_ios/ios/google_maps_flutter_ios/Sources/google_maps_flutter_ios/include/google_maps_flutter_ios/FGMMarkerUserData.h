@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The identifier of the cluster manager.
 /// This property is set only if the marker is managed by a cluster manager.
 @property(nonatomic, copy, nullable) NSString *clusterManagerIdentifier;
+@property(nonatomic, assign) NSInteger itemCount;
 
 @end
 

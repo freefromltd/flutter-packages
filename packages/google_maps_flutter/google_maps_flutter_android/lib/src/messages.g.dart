@@ -1024,6 +1024,7 @@ class PlatformMarker {
     required this.markerId,
     this.clusterManagerId,
     this.collisionBehavior = PlatformMarkerCollisionBehavior.requiredDisplay,
+    this.itemCount,
   });
 
   double alpha;
@@ -1054,6 +1055,8 @@ class PlatformMarker {
 
   PlatformMarkerCollisionBehavior collisionBehavior;
 
+  int? itemCount;
+
   List<Object?> _toList() {
     return <Object?>[
       alpha,
@@ -1070,6 +1073,7 @@ class PlatformMarker {
       markerId,
       clusterManagerId,
       collisionBehavior,
+      itemCount,
     ];
   }
 
@@ -1094,6 +1098,7 @@ class PlatformMarker {
       markerId: result[11]! as String,
       clusterManagerId: result[12] as String?,
       collisionBehavior: result[13]! as PlatformMarkerCollisionBehavior,
+      itemCount: result[14] as int?,
     );
   }
 
@@ -1119,7 +1124,8 @@ class PlatformMarker {
         _deepEquals(zIndex, other.zIndex) &&
         _deepEquals(markerId, other.markerId) &&
         _deepEquals(clusterManagerId, other.clusterManagerId) &&
-        _deepEquals(collisionBehavior, other.collisionBehavior);
+        _deepEquals(collisionBehavior, other.collisionBehavior) &&
+        _deepEquals(itemCount, other.itemCount);
   }
 
   @override

@@ -154,6 +154,7 @@ class Marker implements MapsObject<Marker> {
     double zIndex = 0.0,
     int zIndexInt = 0,
     this.clusterManagerId,
+    this.itemCount,
     this.onTap,
     this.onDrag,
     this.onDragStart,
@@ -170,6 +171,8 @@ class Marker implements MapsObject<Marker> {
 
   /// Marker clustering is managed by [ClusterManager] with [clusterManagerId].
   final ClusterManagerId? clusterManagerId;
+
+  final int? itemCount;
 
   /// The opacity of the marker, between 0.0 and 1.0 inclusive.
   ///
@@ -275,6 +278,7 @@ class Marker implements MapsObject<Marker> {
     ValueChanged<LatLng>? onDragParam,
     ValueChanged<LatLng>? onDragEndParam,
     ClusterManagerId? clusterManagerIdParam,
+    int? itemCountParam,
   }) {
     assert(
       zIndexParam == null || zIndexIntParam == null,
@@ -298,6 +302,7 @@ class Marker implements MapsObject<Marker> {
       onDrag: onDragParam ?? onDrag,
       onDragEnd: onDragEndParam ?? onDragEnd,
       clusterManagerId: clusterManagerIdParam ?? clusterManagerId,
+      itemCount: itemCountParam ?? itemCount,
     );
   }
 
@@ -330,6 +335,7 @@ class Marker implements MapsObject<Marker> {
     addIfPresent('zIndex', zIndex);
     addIfPresent('zIndexInt', zIndexInt);
     addIfPresent('clusterManagerId', clusterManagerId?.value);
+    addIfPresent('itemCount', itemCount);
     return json;
   }
 
@@ -355,7 +361,8 @@ class Marker implements MapsObject<Marker> {
         visible == other.visible &&
         zIndex == other.zIndex &&
         zIndexInt == other.zIndexInt &&
-        clusterManagerId == other.clusterManagerId;
+        clusterManagerId == other.clusterManagerId &&
+        itemCount == other.itemCount;
   }
 
   @override
@@ -367,6 +374,6 @@ class Marker implements MapsObject<Marker> {
         'consumeTapEvents: $consumeTapEvents, draggable: $draggable, flat: $flat, '
         'icon: $icon, infoWindow: $infoWindow, position: $position, rotation: $rotation, '
         'visible: $visible, zIndex: $zIndex, onTap: $onTap, onDragStart: $onDragStart, '
-        'onDrag: $onDrag, onDragEnd: $onDragEnd, clusterManagerId: $clusterManagerId}';
+        'onDrag: $onDrag, onDragEnd: $onDragEnd, clusterManagerId: $clusterManagerId, itemCount: $itemCount}';
   }
 }

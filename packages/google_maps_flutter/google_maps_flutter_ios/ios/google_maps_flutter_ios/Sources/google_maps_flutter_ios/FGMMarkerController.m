@@ -62,6 +62,9 @@
   // Set the marker's user data with current identifiers.
   FGMSetIdentifiersToMarkerUserData(self.markerIdentifier, self.clusterManagerIdentifier,
                                     self.marker);
+  if (platformMarker.itemCount != nil) {
+    ((FGMMarkerUserData *)self.marker.userData).itemCount = platformMarker.itemCount.integerValue;
+  }
 
   // If marker belongs the cluster manager, visibility need to be controlled with the opacity
   // as the cluster manager controls when marker is on the map and when not.

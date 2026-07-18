@@ -882,7 +882,8 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
                        zIndex:(NSInteger)zIndex
                      markerId:(NSString *)markerId
              clusterManagerId:(nullable NSString *)clusterManagerId
-            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior {
+            collisionBehavior:(nullable FGMPlatformMarkerCollisionBehaviorBox *)collisionBehavior
+                    itemCount:(nullable NSNumber *)itemCount {
   FGMPlatformMarker *pigeonResult = [[FGMPlatformMarker alloc] init];
   pigeonResult.alpha = alpha;
   pigeonResult.anchor = anchor;
@@ -898,6 +899,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
   pigeonResult.markerId = markerId;
   pigeonResult.clusterManagerId = clusterManagerId;
   pigeonResult.collisionBehavior = collisionBehavior;
+  pigeonResult.itemCount = itemCount;
   return pigeonResult;
 }
 + (FGMPlatformMarker *)fromList:(NSArray<id> *)list {
@@ -916,6 +918,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
   pigeonResult.markerId = GetNullableObjectAtIndex(list, 11);
   pigeonResult.clusterManagerId = GetNullableObjectAtIndex(list, 12);
   pigeonResult.collisionBehavior = GetNullableObjectAtIndex(list, 13);
+  pigeonResult.itemCount = GetNullableObjectAtIndex(list, 14);
   return pigeonResult;
 }
 + (nullable FGMPlatformMarker *)nullableFromList:(NSArray<id> *)list {
@@ -937,6 +940,7 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
     self.markerId ?: [NSNull null],
     self.clusterManagerId ?: [NSNull null],
     self.collisionBehavior ?: [NSNull null],
+    self.itemCount ?: [NSNull null],
   ];
 }
 @end

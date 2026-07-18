@@ -410,7 +410,14 @@ class ClusterManagersController
       PlatformClusterManager clusterStyle,
       Cluster<?> cluster,
       Map<Integer, com.google.android.gms.maps.model.BitmapDescriptor> iconCache) {
-    int count = cluster.getSize();
+    int count = 0;
+    for (Object item : cluster.getItems()) {
+      if (item instanceof MarkerBuilder) {
+        count += ((MarkerBuilder) item).getItemCount();
+      } else {
+        count += 1;
+      }
+    }
     com.google.android.gms.maps.model.BitmapDescriptor cached = iconCache.get(count);
     if (cached != null) {
       return cached;

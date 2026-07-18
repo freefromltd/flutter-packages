@@ -243,6 +243,7 @@ class PlatformMarker {
     this.zIndex = 0,
     this.clusterManagerId,
     this.collisionBehavior,
+    this.itemCount,
   });
 
   final double alpha;
@@ -260,6 +261,7 @@ class PlatformMarker {
   final String markerId;
   final String? clusterManagerId;
   final PlatformMarkerCollisionBehavior? collisionBehavior;
+  final int? itemCount;
 }
 
 /// Pigeon equivalent of the MarkerCollisionBehavior enum.

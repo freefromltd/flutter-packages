@@ -633,6 +633,7 @@ class GoogleMapsFlutterIOS extends GoogleMapsFlutterPlatform {
       collisionBehavior: marker is AdvancedMarker
           ? platformMarkerCollisionBehaviorFromMarkerCollisionBehavior(marker.collisionBehavior)
           : null,
+      itemCount: marker.itemCount,
     );
   }
 

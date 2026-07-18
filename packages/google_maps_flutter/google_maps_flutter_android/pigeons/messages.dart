@@ -237,6 +237,7 @@ class PlatformMarker {
     this.zIndex = 0.0,
     this.clusterManagerId,
     this.collisionBehavior = PlatformMarkerCollisionBehavior.requiredDisplay,
+    this.itemCount,
   });
 
   final double alpha;
@@ -255,6 +256,7 @@ class PlatformMarker {
   final String? clusterManagerId;
 
   final PlatformMarkerCollisionBehavior collisionBehavior;
+  final int? itemCount;
 }
 
 enum PlatformMarkerCollisionBehavior {

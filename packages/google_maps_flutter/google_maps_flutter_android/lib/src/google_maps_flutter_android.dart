@@ -761,6 +761,7 @@ class GoogleMapsFlutterAndroid extends GoogleMapsFlutterPlatform {
       markerId: marker.markerId.value,
       clusterManagerId: marker.clusterManagerId?.value,
       collisionBehavior: platformMarkerCollisionBehaviorFromMarker(marker),
+      itemCount: marker.itemCount,
     );
   }
 

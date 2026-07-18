@@ -598,6 +598,9 @@ class Convert {
     sink.setVisible(marker.getVisible());
     sink.setZIndex((float) marker.getZIndex());
     sink.setCollisionBehavior(collisionBehaviorFromPigeon(marker.getCollisionBehavior()));
+    if (sink instanceof MarkerBuilder && marker.getItemCount() != null) {
+      ((MarkerBuilder) sink).setItemCount(marker.getItemCount().intValue());
+    }
   }
 
   private static void interpretInfoWindowOptions(
