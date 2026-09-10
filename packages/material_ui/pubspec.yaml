@@ -3,6 +3,7 @@ description: The official Flutter Material UI Library, implementing Google's Mat
 version: 1.4.0
 repository: https://github.com/flutter/packages/tree/main/packages/material_ui
 issue_tracker: https://github.com/flutter/flutter/issues?q=is%3Aissue+is%3Aopen+label%3A%22p%3A%20material_ui%22
+resolution: workspace
 
 environment:
   sdk: ^3.13.0
@@ -22,8 +23,6 @@ dependencies:
 dev_dependencies:
   args: ^2.7.0
   file: ^7.0.1
-  flutter_goldens:
-    path: ../../script/flutter_goldens
   flutter_test:
     sdk: flutter
   # To track memory leaks.
