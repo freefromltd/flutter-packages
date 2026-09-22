@@ -520,6 +520,7 @@
 }
 
 - (void)mapView:(GMSMapView *)mapView idleAtCameraPosition:(GMSCameraPosition *)position {
+  [self.clusterManagersController updateClustersForCameraIdle];
   [self.mapEventHandler didIdleCamera];
 }
 

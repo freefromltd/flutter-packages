@@ -6,9 +6,20 @@ import Flutter
 import GoogleMaps
 import GoogleMapsUtils
 
+private final class FGMClusterRenderer: GMUDefaultClusterRenderer {
+  override func update() {
+    // Skips mapView.projection.visibleRegion during a pan.
+  }
+
+  func updateForCameraIdle() {
+    super.update()
+  }
+}
+
 /// A controller that manages all of the cluster managers on a map.
 class ClusterManagersController {
   private var clusterManagerIdentifierToManagers: [String: GMUClusterManager] = [:]
+  private var clusterManagerIdentifierToRenderers: [String: FGMClusterRenderer] = [:]
   private weak var eventDelegate: MapEventDelegate?
   private weak var mapView: GMSMapView?
 
@@ -27,7 +38,8 @@ class ClusterManagersController {
     guard let mapView = mapView else { return }
     let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
     let iconGenerator = GMUDefaultClusterIconGenerator()
-    let renderer = GMUDefaultClusterRenderer(mapView: mapView, clusterIconGenerator: iconGenerator)
+    let renderer = FGMClusterRenderer(mapView: mapView, clusterIconGenerator: iconGenerator)
+    clusterManagerIdentifierToRenderers[identifier] = renderer
     clusterManagerIdentifierToManagers[identifier] = GMUClusterManager(
       map: mapView,
       algorithm: algorithm,
@@ -40,8 +52,13 @@ class ClusterManagersController {
       if let clusterManager = clusterManagerIdentifierToManagers[identifier] {
         clusterManager.clearItems()
         clusterManagerIdentifierToManagers.removeValue(forKey: identifier)
+        clusterManagerIdentifierToRenderers.removeValue(forKey: identifier)
       }
     }
+  }
+
+  func updateClustersForCameraIdle() {
+    clusterManagerIdentifierToRenderers.values.forEach { $0.updateForCameraIdle() }
   }
 
   func clusterManager(withIdentifier identifier: String) -> GMUClusterManager? {

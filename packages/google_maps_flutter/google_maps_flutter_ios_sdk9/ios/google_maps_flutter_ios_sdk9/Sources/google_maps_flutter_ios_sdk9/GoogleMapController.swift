@@ -327,6 +327,7 @@ public class GoogleMapController: NSObject, GMSMapViewDelegate, FlutterPlatformV
   }
 
   public func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
+    clusterManagersController.updateClustersForCameraIdle()
     Task {
       try await dartCallbackHandler.didIdleCamera()
     }

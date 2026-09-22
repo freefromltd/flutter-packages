@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Calls the cluster method of all the cluster managers.
 - (void)invokeClusteringForEachClusterManager;
+
+- (void)updateClustersForCameraIdle;
 @end
 
 NS_ASSUME_NONNULL_END

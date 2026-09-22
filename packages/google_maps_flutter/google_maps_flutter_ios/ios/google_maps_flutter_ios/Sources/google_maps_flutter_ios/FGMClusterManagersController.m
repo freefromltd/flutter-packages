@@ -117,6 +117,22 @@
 
 @end
 
+@interface FGMClusterRenderer : GMUDefaultClusterRenderer
+- (void)updateForCameraIdle;
+@end
+
+@implementation FGMClusterRenderer
+
+- (void)update {
+  // Skips mapView.projection.visibleRegion during a pan.
+}
+
+- (void)updateForCameraIdle {
+  [super update];
+}
+
+@end
+
 @interface FGMClusterManagersController () <GMUClusterRendererDelegate>
 
 /// A dictionary mapping unique cluster manager identifiers to their corresponding cluster managers.
@@ -125,6 +141,9 @@
 
 @property(strong, nonatomic)
     NSMutableDictionary<NSString *, id<GMUClusterIconGenerator>> *clusterManagerIdentifierToIconGenerators;
+
+@property(strong, nonatomic)
+    NSMutableDictionary<NSString *, FGMClusterRenderer *> *clusterManagerIdentifierToRenderers;
 
 /// The delegate for handling interactions with clusters.
 @property(weak, nonatomic) NSObject<FGMMapEventDelegate> *eventDelegate;
@@ -143,6 +162,7 @@
     _mapView = mapView;
     _clusterManagerIdentifierToManagers = [[NSMutableDictionary alloc] init];
     _clusterManagerIdentifierToIconGenerators = [[NSMutableDictionary alloc] init];
+    _clusterManagerIdentifierToRenderers = [[NSMutableDictionary alloc] init];
   }
   return self;
 }
@@ -172,15 +192,14 @@
     }
     self.clusterManagerIdentifierToIconGenerators[clusterManager.identifier] = iconGenerator;
     
-    id<GMUClusterRenderer> renderer =
-        [[GMUDefaultClusterRenderer alloc] initWithMapView:self.mapView
-                                      clusterIconGenerator:iconGenerator];
-    if ([renderer isKindOfClass:[GMUDefaultClusterRenderer class]]) {
-      ((GMUDefaultClusterRenderer *)renderer).delegate = self;
-      if (clusterManager.minClusterSize != nil) {
-        ((GMUDefaultClusterRenderer *)renderer).minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
-      }
+    FGMClusterRenderer *renderer =
+        [[FGMClusterRenderer alloc] initWithMapView:self.mapView
+                               clusterIconGenerator:iconGenerator];
+    renderer.delegate = self;
+    if (clusterManager.minClusterSize != nil) {
+      renderer.minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
     }
+    self.clusterManagerIdentifierToRenderers[clusterManager.identifier] = renderer;
     [existingManager setValue:renderer forKey:@"renderer"];
     [existingManager cluster];
     return;
@@ -199,15 +218,14 @@
     iconGenerator = [[GMUDefaultClusterIconGenerator alloc] init];
   }
   self.clusterManagerIdentifierToIconGenerators[clusterManager.identifier] = iconGenerator;
-  id<GMUClusterRenderer> renderer =
-      [[GMUDefaultClusterRenderer alloc] initWithMapView:self.mapView
-                                    clusterIconGenerator:iconGenerator];
-  if ([renderer isKindOfClass:[GMUDefaultClusterRenderer class]]) {
-    ((GMUDefaultClusterRenderer *)renderer).delegate = self;
-    if (clusterManager.minClusterSize != nil) {
-      ((GMUDefaultClusterRenderer *)renderer).minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
-    }
+  FGMClusterRenderer *renderer =
+      [[FGMClusterRenderer alloc] initWithMapView:self.mapView
+                             clusterIconGenerator:iconGenerator];
+  renderer.delegate = self;
+  if (clusterManager.minClusterSize != nil) {
+    renderer.minimumClusterSize = clusterManager.minClusterSize.unsignedIntegerValue;
   }
+  self.clusterManagerIdentifierToRenderers[clusterManager.identifier] = renderer;
   self.clusterManagerIdentifierToManagers[clusterManager.identifier] =
       [[GMUClusterManager alloc] initWithMap:self.mapView algorithm:algorithm renderer:renderer];
 }
@@ -222,6 +240,13 @@
     [clusterManager clearItems];
     [self.clusterManagerIdentifierToManagers removeObjectForKey:identifier];
     [self.clusterManagerIdentifierToIconGenerators removeObjectForKey:identifier];
+    [self.clusterManagerIdentifierToRenderers removeObjectForKey:identifier];
+  }
+}
+
+- (void)updateClustersForCameraIdle {
+  for (FGMClusterRenderer *renderer in [self.clusterManagerIdentifierToRenderers allValues]) {
+    [renderer updateForCameraIdle];
   }
 }
 
